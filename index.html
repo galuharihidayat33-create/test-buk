@@ -1,1049 +1,1310 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
-
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Wedding Guestbook — Modern</title>
-
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Fonts -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Outfit:wght@300;400;600;700&display=swap"
-    rel="stylesheet">
-
-  <!-- Utilities -->
-  <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <style>
-    :root {
-      --primary: #0f172a;
-      --muted: #64748b;
-      --accent: #7c3aed;
-      --bg-soft: #fbfbfe;
-      --overlay: rgba(12, 12, 18, 0.32);
-    }
-
-    html,
-    body {
-      height: 100%
-    }
-
-    body {
-      font-family: 'DM Sans', system-ui, -apple-system, "Segoe UI", Roboto;
-      background: var(--bg-soft);
-      color: var(--primary);
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      margin: 0;
-    }
-
-    .glass {
-      background: rgba(255, 255, 255, 0.86);
-      backdrop-filter: blur(6px);
-    }
-
-    .card {
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
-    }
-
-    .round-md {
-      border-radius: 10px;
-    }
-
-    .hero-min {
-      min-height: 420px;
-    }
-
-    @media(min-width:1024px) {
-      .hero-min {
-        min-height: 520px
-      }
-    }
-
-    .btn-accent {
-      background: linear-gradient(90deg, var(--accent), #a78bfa);
-      color: white;
-    }
-
-    .text-accent {
-      color: var(--accent);
-    }
-
-    .countdown {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .countdown .item {
-      background: white;
-      padding: 8px 12px;
-      border-radius: 8px;
-      min-width: 64px;
-      text-align: center;
-      box-shadow: 0 8px 20px rgba(2, 6, 23, 0.06);
-    }
-
-    /* loading */
-    
-
-    #splash.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    /* responsive sidebar hide on mobile using transform */
-    #sidebar {
-      transition: transform .28s ease;
-      transform: translateX(0);
-    }
-
-    .sidebar-hidden {
-      transform: translateX(-110%);
-    }
-
-    /* small utilities */
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Guest Book - Buku Tamu Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .bg-gradient-wedding {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .bg-gradient-gold {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        }
+        .sidebar-hidden { transform: translateX(-100%); }
+        .sidebar-visible { transform: translateX(0); }
+        .transition-transform { transition: transform 0.3s ease-in-out; }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .wedding-bg {
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="bg" cx="50%" cy="50%"><stop offset="0%" style="stop-color:%23ffeaa7"/><stop offset="100%" style="stop-color:%23fab1a0"/></radialGradient></defs><rect width="1000" height="1000" fill="url(%23bg)"/><g opacity="0.1"><circle cx="200" cy="200" r="100" fill="%23fff"/><circle cx="800" cy="300" r="80" fill="%23fff"/><circle cx="300" cy="700" r="120" fill="%23fff"/><circle cx="700" cy="800" r="90" fill="%23fff"/></g></svg>');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
 </head>
-
-<body>
-
-  <!-- Splash / loading -->
-  
-  <!-- Background hero -->
-  <div id="bgHero" class="fixed inset-0 bg-cover bg-center"
-    style="z-index:0; background-image: linear-gradient(rgba(255,255,255,0.35), rgba(255,255,255,0.35)), url('');">
-  </div>
-  <div
-    style="position:fixed; inset:0; z-index:1; background:linear-gradient(180deg, transparent, rgba(255,255,255,0.45)); pointer-events:none;">
-  </div>
-
-  <!-- Login modal -->
-  <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div class="w-full max-w-md p-6 round-md glass card">
-      <h2 class="text-2xl font-semibold font-Outfit mb-2">Masuk Dashboard</h2>
-      <p class="text-sm text-gray-600 mb-4">Pilih role: <strong>Admin</strong> atau <strong>Operator</strong></p>
-
-      <div id="loginOptions" class="space-y-3">
-        <div>
-          <label class="text-sm text-gray-700">Password Admin</label>
-          <input id="adminPass" type="password" placeholder="Masukkan password admin"
-            class="w-full mt-2 px-3 py-2 rounded-md border" />
+<body class="bg-gray-50">
+    <!-- Login Section -->
+    <div id="loginSection" class="min-h-screen wedding-bg flex items-center justify-center p-4">
+        <div class="glass-effect rounded-2xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="font-playfair text-4xl font-bold text-white mb-2">Wedding Guest Book</h1>
+                <p class="text-white/80">Sistem Buku Tamu Digital</p>
+            </div>
+            
+            <div class="space-y-4">
+                <button onclick="showOperatorLogin()" class="w-full bg-white/20 hover:bg-white/30 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300">
+                    Login Operator
+                </button>
+                <button onclick="showAdminLogin()" class="w-full bg-gradient-gold text-white font-semibold py-3 px-6 rounded-lg hover:shadow-lg transition-all duration-300">
+                    Login Admin
+                </button>
+            </div>
         </div>
-
-        <div class="flex gap-3">
-          <button id="btnLoginAdmin" class="flex-1 py-2 rounded-md btn-accent">Masuk sebagai Admin</button>
-          <button id="openOpName" class="flex-1 py-2 rounded-md border">Masuk sebagai Operator</button>
-        </div>
-        <p class="text-xs text-gray-400">Admin default: <code>admin / 1234</code>. Operator masuk cukup dengan
-          memasukkan nama.</p>
-      </div>
-
-      <div id="opNameArea" class="hidden space-y-3">
-        <label class="text-sm text-gray-700">Nama Operator</label>
-        <input id="opNameInput" type="text" placeholder="Contoh: Rina"
-          class="w-full mt-2 px-3 py-2 rounded-md border" />
-        <div class="flex gap-3">
-          <button id="btnLoginOp" class="flex-1 py-2 rounded-md bg-emerald-600 text-white">Masuk</button>
-          <button id="btnCancelOp" class="flex-1 py-2 rounded-md border">Batal</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- App container -->
-  <div id="app" class="relative z-20 hidden min-h-screen">
-
-    <!-- Topbar -->
-    <div class="sticky top-4 z-30 px-4">
-      <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <button id="btnToggleNav" class="p-2 rounded-md border bg-white/90 card" title="Toggle menu">☰</button>
-          <div class="text-lg font-semibold font-Outfit">Wedding Guestbook</div>
-        </div>
-        <div class="flex items-center gap-3">
-          <div id="headerUser" class="text-sm text-gray-700"></div>
-          <button id="btnLogout" class="px-3 py-2 rounded-md border bg-white/90">Logout</button>
-        </div>
-      </div>
     </div>
 
-    <div class="max-w-7xl mx-auto lg:flex gap-6 p-4 lg:p-6">
-
-      <!-- Sidebar / Nav -->
-      <aside id="sidebar" class="w-full lg:w-72 card glass p-4 round-md" style="z-index:12;">
-        <div class="mb-4">
-          <div class="text-xs text-gray-500">Event</div>
-          <div id="sidebarEventName" class="font-Outfit text-xl">Wedding Guestbook</div>
-          <div id="currentBookName" class="text-sm text-gray-500 mt-1">Default</div>
+    <!-- Operator Login Modal -->
+    <div id="operatorModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h3 class="font-playfair text-2xl font-bold text-gray-800 mb-4">Login Operator</h3>
+            <form onsubmit="loginOperator(event)">
+                <div class="mb-4">
+                    <label for="operatorName" class="block text-sm font-medium text-gray-700 mb-2">Nama Operator</label>
+                    <input type="text" id="operatorName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <div class="flex space-x-3">
+                    <button type="button" onclick="closeModal('operatorModal')" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                        Masuk
+                    </button>
+                </div>
+            </form>
         </div>
-
-        <nav class="space-y-2">
-          <button data-section="home" class="navBtn w-full text-left px-4 py-2 rounded-md hover:bg-gray-50">🏠
-            Home</button>
-          <div class="text-xs text-gray-400 px-4 mt-2">Check-in</div>
-          <button data-section="checkin" class="navBtn w-full text-left px-4 py-2 rounded-md hover:bg-gray-50">🎟️
-            Check-In</button>
-          <button data-section="popup" class="navBtn w-full text-left px-4 py-2 rounded-md hover:bg-gray-50">💌 Popup
-            Ucapan</button>
-          <button data-section="guestbook" class="navBtn w-full text-left px-4 py-2 rounded-md hover:bg-gray-50">✍️ Buku
-            Tamu</button>
-          <button data-section="database" class="navBtn w-full text-left px-4 py-2 rounded-md hover:bg-gray-50">📋
-            Database</button>
-          <button data-section="monitor" class="navBtn w-full text-left px-4 py-2 rounded-md hover:bg-gray-50">📊
-            Monitoring</button>
-          <button data-section="settings" class="navBtn w-full text-left px-4 py-2 rounded-md hover:bg-gray-50">⚙️
-            Pengaturan</button>
-          <button data-section="about" class="navBtn w-full text-left px-4 py-2 rounded-md hover:bg-gray-50">ℹ️
-            About</button>
-        </nav>
-
-        <div class="mt-4 text-xs text-gray-500">
-          <div>Role: <span id="displayRole" class="font-medium">Operator</span></div>
-          <div id="operatorNameDisplay" class="mt-2"></div>
-        </div>
-      </aside>
-
-      <!-- Main -->
-      <main class="flex-1">
-
-        <!-- HOME -->
-        <section data-section-id="home" class="section">
-          <div class="relative round-md overflow-hidden hero-min card">
-            <div id="heroOverlay" class="absolute inset-0" style="background:var(--overlay)"></div>
-            <div class="relative z-10 p-8 text-center">
-              <h1 id="homeNames" class="text-3xl md:text-5xl font-Outfit font-semibold">Nama A & Nama B</h1>
-              <p id="homeSambutan" class="text-sm text-gray-700 max-w-2xl mx-auto mt-3">Terima kasih atas kehadiran —
-                silakan check-in atau tinggalkan ucapan.</p>
-
-              <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <div class="bg-white p-4 round-md card min-w-[130px] text-center">
-                  <div class="text-xs text-gray-500">Total Tamu</div>
-                  <div id="homeTotal" class="text-2xl font-semibold">0</div>
-                </div>
-                <div class="bg-white p-4 round-md card min-w-[130px] text-center">
-                  <div class="text-xs text-gray-500">Hadir</div>
-                  <div id="homePresent" class="text-2xl font-semibold">0</div>
-                </div>
-                <div class="bg-white p-4 round-md card min-w-[130px] text-center">
-                  <div class="text-xs text-gray-500">Ucapan</div>
-                  <div id="homeMsgs" class="text-2xl font-semibold">0</div>
-                </div>
-              </div>
-
-              <div class="mt-8">
-                <div id="countdownWrap" class="countdown"></div>
-              </div>
-
-              <div class="mt-8 max-w-3xl mx-auto text-left">
-                <h4 class="font-medium">Ucapan Terbaru</h4>
-                <div id="homeLatestMsgs" class="mt-3 space-y-2 max-h-40 overflow-auto bg-white p-3 round-md"></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- CHECK-IN -->
-        <section data-section-id="checkin" class="section hidden">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white p-6 round-md card">
-              <div class="flex items-start justify-between">
-                <div>
-                  <h3 class="font-semibold text-lg">Scanner QR (Kamera)</h3>
-                  <p class="text-sm text-gray-500">Tekan <strong>Jalankan</strong> untuk mengaktifkan kamera.</p>
-                </div>
-                <div class="text-sm text-gray-500">Mode: Kamera / Manual</div>
-              </div>
-
-              <div class="mt-4">
-                <video id="scanVideo" class="w-full rounded-md bg-black" autoplay muted playsinline></video>
-                <canvas id="scanCanvas" class="hidden"></canvas>
-                <p id="scanStatus" class="mt-2 text-green-600"></p>
-                <div class="mt-3 flex gap-2">
-                  <button id="startScan" class="px-4 py-2 rounded-md btn-accent">Jalankan</button>
-                  <button id="stopScan" class="px-4 py-2 rounded-md border">Stop</button>
-                </div>
-              </div>
-
-              <hr class="my-4">
-
-              <h4 class="font-medium">Form Tamu (Isi oleh tamu saat datang)</h4>
-              <form id="guestFillForm" class="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
-                <input id="guestNameFill" class="rounded-md border px-3 py-2 md:col-span-2" placeholder="Nama tamu" />
-                <input id="guestCountFill" type="number" min="1" value="1" class="rounded-md border px-3 py-2"
-                  placeholder="Jumlah" />
-                <input id="guestContactFill" class="rounded-md border px-3 py-2 md:col-span-2"
-                  placeholder="Kontak (opsional)" />
-                <input id="guestUcapanFill" class="rounded-md border px-3 py-2 md:col-span-3"
-                  placeholder="Ucapan singkat (opsional)" />
-                <button id="btnGuestSubmit" class="px-4 py-2 rounded-md bg-emerald-600 text-white md:col-span-1">Submit
-                  & Generate QR</button>
-              </form>
-
-              <div class="mt-4" id="guestQrPreview"></div>
-
-              <hr class="my-4">
-              <h4 class="font-medium">Daftar Check-in Terakhir</h4>
-              <div id="checkinRecent" class="mt-3 space-y-2 max-h-60 overflow-auto"></div>
-            </div>
-
-            <aside class="bg-white p-6 round-md card">
-              <h4 class="font-semibold">Info</h4>
-              <p class="text-sm text-gray-600 mt-2">Pengunjung dapat mengisi form. Setelah submit akan menghasilkan ID &
-                QR yang dapat discan untuk verifikasi ulang.</p>
-            </aside>
-          </div>
-        </section>
-
-        <!-- POPUP -->
-        <section data-section-id="popup" class="section hidden">
-          <div class="bg-white p-6 round-md card">
-            <h3 class="font-semibold">Popup Ucapan (Fullscreen)</h3>
-            <p class="text-sm text-gray-500">Tampilkan ucapan terbaru ke layar besar (monitor tamu).</p>
-            <div class="mt-4 flex gap-2">
-              <button id="showPopupBtn" class="px-4 py-2 rounded-md bg-pink-600 text-white">Tampilkan Popup</button>
-              <button id="hidePopupBtn" class="px-4 py-2 rounded-md border">Sembunyikan Popup</button>
-            </div>
-            <div class="mt-4 text-sm text-gray-600">Mode popup mengambil 5 ucapan terbaru.</div>
-          </div>
-        </section>
-
-        <!-- GUESTBOOK -->
-        <section data-section-id="guestbook" class="section hidden">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <main class="lg:col-span-2 bg-white p-6 round-md card">
-              <h3 class="font-semibold">Daftar Semua Ucapan (Publik)</h3>
-              <div id="msgList" class="mt-3 space-y-3 max-h-96 overflow-auto"></div>
-            </main>
-
-            <aside class="bg-white p-6 round-md card">
-              <h4 class="font-semibold">Petunjuk</h4>
-              <p class="text-sm text-gray-600 mt-2">Halaman ini hanya menampilkan ucapan yang sudah dikirim melalui form
-                Check-In.</p>
-            </aside>
-          </div>
-        </section>
-
-        <!-- DATABASE -->
-        <section data-section-id="database" class="section hidden">
-          <div class="bg-white p-4 round-md card">
-            <div class="flex items-center justify-between">
-              <h3 class="font-semibold">Database Tamu</h3>
-              <div class="flex gap-2">
-                <input id="searchInput" class="rounded-md border px-3 py-2" placeholder="Cari nama atau ID" />
-                <button id="exportCsvBtn" class="px-3 py-2 rounded-md border">Export CSV</button>
-              </div>
-            </div>
-
-            <div class="overflow-x-auto mt-4">
-              <table class="min-w-full text-sm">
-                <thead>
-                  <tr class="text-gray-600">
-                    <th class="px-3 py-2">ID</th>
-                    <th class="px-3 py-2">Nama</th>
-                    <th class="px-3 py-2">Kontak</th>
-                    <th class="px-3 py-2">Jumlah</th>
-                    <th class="px-3 py-2">Tanggal</th>
-                    <th class="px-3 py-2">Waktu</th>
-                    <th class="px-3 py-2">Status</th>
-                    <th class="px-3 py-2">Ucapan</th>
-                    <th class="px-3 py-2">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="dbTbody"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- MONITOR -->
-        <section data-section-id="monitor" class="section hidden">
-          <div class="bg-white p-6 round-md card">
-            <h3 class="font-semibold">Monitoring (Realtime)</h3>
-            <p class="text-sm text-gray-500">Grafik update otomatis setiap 5 detik saat ada data baru.</p>
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="p-4 bg-white round-md card">
-                <h4 class="font-medium">Jumlah Tamu Hadir per Jam</h4>
-                <canvas id="chartGuests" height="180"></canvas>
-              </div>
-              <div class="p-4 bg-white round-md card">
-                <h4 class="font-medium">Jumlah Ucapan per Jam</h4>
-                <canvas id="chartMsgs" height="180"></canvas>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- SETTINGS -->
-        <section data-section-id="settings" class="section hidden">
-          <div class="bg-white p-6 round-md card">
-            <h3 class="font-semibold">Pengaturan</h3>
-
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div id="adminOnly_name">
-                <label class="text-sm text-gray-700">Nama mempelai (Groom & Bride)</label>
-                <input id="setNames" class="w-full rounded-md border px-3 py-2 mt-2" placeholder="Nama A & Nama B" />
-              </div>
-
-              <div>
-                <label class="text-sm text-gray-700">Tanggal acara</label>
-                <input id="setDate" type="datetime-local" class="w-full rounded-md border px-3 py-2 mt-2" />
-                <p class="text-xs text-gray-400 mt-1">Operator juga dapat mengubah tanggal.</p>
-              </div>
-
-              <div id="adminOnly_bg">
-                <label class="text-sm text-gray-700">Upload Foto Background (Admin)</label>
-                <input id="bgUpload" type="file" accept="image/*" class="w-full mt-2" />
-                <p class="text-xs text-gray-400 mt-1">Foto akan menjadi background pada Home.</p>
-              </div>
-
-              <div>
-                <label class="text-sm text-gray-700">Upload Musik (MP3)</label>
-                <input id="musicUpload" type="file" accept="audio/*" class="w-full mt-2" />
-                <p class="text-xs text-gray-400 mt-1">Operator & Admin boleh upload musik.</p>
-              </div>
-
-              <div>
-                <label class="text-sm text-gray-700">Kontrol Musik</label>
-                <div class="mt-2 flex items-center gap-3">
-                  <button id="playMusic" class="px-4 py-2 rounded-md btn-accent">Play</button>
-                  <button id="pauseMusic" class="px-4 py-2 rounded-md border">Pause</button>
-                </div>
-                <div class="mt-3">
-                  <input id="volumeControl" type="range" min="0" max="1" step="0.01" value="0.5" class="w-full" />
-                  <div class="text-xs text-gray-400 mt-1">Atur volume (Operator hanya dapat mengubah musik, volume,
-                    tanggal, tema)</div>
-                </div>
-              </div>
-
-              <div id="adminOnly_photoUrl">
-                <label class="text-sm text-gray-700">Foto (URL) — alternatif</label>
-                <input id="setPhoto" class="w-full rounded-md border px-3 py-2 mt-2" placeholder="https://..." />
-              </div>
-
-              <div id="adminOnly_pass">
-                <label class="text-sm text-gray-700">Password Admin (ubah)</label>
-                <input id="setAdminPass" type="password" class="w-full rounded-md border px-3 py-2 mt-2"
-                  placeholder="Kosongkan jika tidak ingin ganti" />
-              </div>
-
-              <div>
-                <label class="text-sm text-gray-700">Tema Warna</label>
-                <select id="themeSelect" class="w-full rounded-md border px-3 py-2 mt-2">
-                  <option value="default">Clean White (default)</option>
-                  <option value="soft-pink">Soft Pink</option>
-                  <option value="gold-cream">Gold & Cream</option>
-                  <option value="blue-silver">Blue & Silver</option>
-                  <option value="sage-green">Sage Green</option>
-                  <option value="custom">Custom (hex)</option>
-                </select>
-                <div id="customThemeInputs" class="mt-2 hidden">
-                  <input id="customPrimary" placeholder="#123456" class="w-full rounded-md border px-3 py-2 mb-2" />
-                  <input id="customAccent" placeholder="#abcdef" class="w-full rounded-md border px-3 py-2" />
-                </div>
-              </div>
-
-            </div>
-
-            <div class="mt-4 flex gap-3">
-              <button id="saveSettings" class="px-4 py-2 rounded-md btn-accent">Simpan Pengaturan</button>
-              <button id="createBook" class="px-4 py-2 rounded-md border">Buat Client Baru</button>
-              <button id="resetClient" class="px-4 py-2 rounded-md border">Reset Data Client</button>
-            </div>
-
-            <hr class="my-4" />
-            <h4 class="font-semibold">Operator Management</h4>
-            <div id="opList" class="mt-3"></div>
-          </div>
-        </section>
-
-        <!-- ABOUT -->
-        <section data-section-id="about" class="section hidden">
-          <div class="bg-white p-6 round-md card">
-            <h3 class="font-semibold">About</h3>
-            <p class="text-sm text-gray-600 mt-2">Modern Guestbook template — responsive, offline-first (localStorage).
-            </p>
-          </div>
-        </section>
-      </main>
     </div>
-  </div>
 
-  <!-- Popup fullscreen -->
-  <div id="fullPopup" class="fixed inset-0 hidden bg-black text-white flex items-center justify-center z-50">
-    <div id="fullPopupInner" class="max-w-4xl w-full p-8 space-y-4 text-center"></div>
-  </div>
+    <!-- Admin Login Modal -->
+    <div id="adminModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h3 class="font-playfair text-2xl font-bold text-gray-800 mb-4">Login Admin</h3>
+            <form onsubmit="loginAdmin(event)">
+                <div class="mb-4">
+                    <label for="adminName" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" id="adminName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <div class="mb-4">
+                    <label for="adminPassword" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="adminPassword" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <div class="flex space-x-3">
+                    <button type="button" onclick="closeModal('adminModal')" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                        Masuk
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-  <!-- Audio element -->
-  <audio id="bgAudio" loop></audio>
+    <!-- Dashboard -->
+    <div id="dashboard" class="hidden min-h-screen bg-gray-50">
+        <!-- Sidebar -->
+        <div id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-gradient-wedding text-white transition-transform z-40">
+            <div class="p-6">
+                <h2 class="font-playfair text-2xl font-bold mb-8">Dashboard</h2>
+                <nav class="space-y-2">
+                    <button onclick="showSection('home')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-white/20 transition-colors">
+                        🏠 Home
+                    </button>
+                    <button onclick="showSection('checkin')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-white/20 transition-colors">
+                        ✅ Check-in
+                    </button>
+                    <button onclick="showSection('messages')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-white/20 transition-colors">
+                        💌 Ucapan
+                    </button>
+                    <button onclick="showSection('analytics')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-white/20 transition-colors">
+                        📊 Grafik
+                    </button>
+                    <button onclick="showSection('database')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-white/20 transition-colors">
+                        🗄️ Database
+                    </button>
+                    <button onclick="showSection('settings')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-white/20 transition-colors" id="settingsBtn">
+                        ⚙️ Pengaturan
+                    </button>
+                    <button onclick="showSection('about')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-white/20 transition-colors">
+                        ℹ️ About Us
+                    </button>
+                </nav>
+                <button onclick="logout()" class="w-full mt-8 bg-red-500 hover:bg-red-600 px-4 py-3 rounded-lg transition-colors">
+                    🚪 Logout
+                </button>
+            </div>
+        </div>
 
-  <script>
-    /* ===========================
-       Data & persistence
-       =========================== */
-    const STORAGE_KEY = 'wedding_guestbook_modern_v1';
-    const DEFAULT_ADMIN_PASS = '1234';
-    function uid(prefix = 'id') { return prefix + '-' + Math.random().toString(36).slice(2, 9); }
+        <!-- Main Content -->
+        <div id="mainContent" class="ml-64 transition-all duration-300">
+            <!-- Header -->
+            <header class="bg-white shadow-sm p-4 flex items-center justify-between">
+                <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-gray-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                <div class="text-right">
+                    <p class="text-sm text-gray-600" id="currentDateTime"></p>
+                    <p class="font-semibold" id="currentUser"></p>
+                </div>
+            </header>
 
-    function loadData() {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) {
-        const seed = {
-          clients: [
-            { id: 'client-default', name: 'Default Event', groom: 'Nama A', bride: 'Nama B', photo: '', date: '', adminPass: DEFAULT_ADMIN_PASS, operators: [], guests: [], messages: [], music: '', bgDataUrl: '', theme: 'default' }
-          ],
-          activeClient: 'client-default'
+            <!-- Home Section -->
+            <section id="homeSection" class="section p-6">
+                <div class="wedding-bg rounded-2xl p-8 mb-6 text-center text-white min-h-96 flex flex-col justify-center">
+                    <h1 class="font-playfair text-6xl font-bold mb-4" id="brideName">Sarah & Ahmad</h1>
+                    <p class="text-xl mb-6">Menikah Insya Allah</p>
+                    <p class="text-lg" id="weddingDate">15 Desember 2024</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">Total Undangan</p>
+                                <p class="text-3xl font-bold text-purple-600" id="totalInvitations">0</p>
+                            </div>
+                            <div class="bg-purple-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">Sudah Check-in</p>
+                                <p class="text-3xl font-bold text-green-600" id="totalCheckin">0</p>
+                            </div>
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">Jam</p>
+                                <p class="text-2xl font-bold text-blue-600" id="currentTime">00:00</p>
+                            </div>
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">Ucapan</p>
+                                <p class="text-3xl font-bold text-pink-600" id="totalMessages">0</p>
+                            </div>
+                            <div class="bg-pink-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-pink-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 bg-white rounded-xl p-6 shadow-lg">
+                    <h3 class="text-lg font-semibold mb-4">Grafik Check-in Hari Ini</h3>
+                    <canvas id="checkinChart" width="400" height="200"></canvas>
+                </div>
+            </section>
+
+            <!-- Check-in Section -->
+            <section id="checkinSection" class="section hidden p-6">
+                <h2 class="text-2xl font-bold mb-6">Check-in Tamu</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <button onclick="showQRScanner()" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 rounded-xl hover:shadow-lg transition-all">
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">📱</div>
+                            <h3 class="text-lg font-semibold">QR Scanner</h3>
+                            <p class="text-sm opacity-90">Scan QR Code tamu</p>
+                        </div>
+                    </button>
+                    
+                    <button onclick="showManualQR()" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white p-6 rounded-xl hover:shadow-lg transition-all">
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">🔢</div>
+                            <h3 class="text-lg font-semibold">QR Manual</h3>
+                            <p class="text-sm opacity-90">Input kode QR manual</p>
+                        </div>
+                    </button>
+                    
+                    <button onclick="showManualCheckin()" class="bg-gradient-to-r from-green-500 to-teal-500 text-white p-6 rounded-xl hover:shadow-lg transition-all">
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">✍️</div>
+                            <h3 class="text-lg font-semibold">Manual Check-in</h3>
+                            <p class="text-sm opacity-90">Input data manual</p>
+                        </div>
+                    </button>
+                </div>
+                
+                <!-- QR Scanner -->
+                <div id="qrScannerDiv" class="hidden bg-white rounded-xl p-6 shadow-lg">
+                    <h3 class="text-lg font-semibold mb-4">QR Code Scanner</h3>
+                    <div id="qr-reader" class="mb-4"></div>
+                    <button onclick="hideQRScanner()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Tutup Scanner</button>
+                </div>
+                
+                <!-- Manual QR -->
+                <div id="manualQRDiv" class="hidden bg-white rounded-xl p-6 shadow-lg">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- QR Code Generator -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">Generate QR Code untuk Tamu</h3>
+                            <form onsubmit="generateQRCode(event)">
+                                <div class="mb-4">
+                                    <label for="guestNameQR" class="block text-sm font-medium text-gray-700 mb-2">Nama Tamu</label>
+                                    <input type="text" id="guestNameQR" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="guestCountQR" class="block text-sm font-medium text-gray-700 mb-2">Jumlah Tamu</label>
+                                    <input type="number" id="guestCountQR" min="1" value="1" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                </div>
+                                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
+                                    Generate QR Code
+                                </button>
+                            </form>
+                            
+                            <!-- Generated QR Code Display -->
+                            <div id="qrCodeDisplay" class="hidden mt-6 text-center">
+                                <h4 class="font-semibold mb-3">QR Code untuk <span id="qrGuestName"></span></h4>
+                                <div id="qrCodeImage" class="bg-white p-4 rounded-lg border-2 border-dashed border-gray-300 inline-block"></div>
+                                <p class="text-sm text-gray-600 mt-2">Tamu dapat scan QR code ini untuk check-in mandiri</p>
+                                <div class="flex space-x-2 mt-4">
+                                    <button onclick="downloadQRCode()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                                        📥 Download
+                                    </button>
+                                    <button onclick="printQRCode()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                                        🖨️ Print
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Manual QR Input -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">Input QR Code Manual</h3>
+                            <form onsubmit="processManualQR(event)">
+                                <div class="mb-4">
+                                    <label for="qrCode" class="block text-sm font-medium text-gray-700 mb-2">Kode QR</label>
+                                    <input type="text" id="qrCode" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" placeholder="Masukkan kode QR...">
+                                </div>
+                                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
+                                    Proses QR Code
+                                </button>
+                            </form>
+                            
+                            <!-- Sample QR Codes -->
+                            <div class="mt-6">
+                                <h4 class="font-semibold mb-3">Contoh QR Code:</h4>
+                                <div class="space-y-2 text-sm">
+                                    <div class="bg-gray-50 p-2 rounded">
+                                        <code>John Doe|2</code>
+                                        <button onclick="document.getElementById('qrCode').value='John Doe|2'" class="ml-2 text-blue-600 hover:underline">Gunakan</button>
+                                    </div>
+                                    <div class="bg-gray-50 p-2 rounded">
+                                        <code>Siti Aminah|1</code>
+                                        <button onclick="document.getElementById('qrCode').value='Siti Aminah|1'" class="ml-2 text-blue-600 hover:underline">Gunakan</button>
+                                    </div>
+                                    <div class="bg-gray-50 p-2 rounded">
+                                        <code>Keluarga Budi|4</code>
+                                        <button onclick="document.getElementById('qrCode').value='Keluarga Budi|4'" class="ml-2 text-blue-600 hover:underline">Gunakan</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-center">
+                        <button onclick="hideManualQR()" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Manual Check-in -->
+                <div id="manualCheckinDiv" class="hidden bg-white rounded-xl p-6 shadow-lg">
+                    <h3 class="text-lg font-semibold mb-4">Check-in Manual</h3>
+                    <form onsubmit="processManualCheckin(event)">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label for="guestName" class="block text-sm font-medium text-gray-700 mb-2">Nama Tamu</label>
+                                <input type="text" id="guestName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            </div>
+                            <div>
+                                <label for="guestCount" class="block text-sm font-medium text-gray-700 mb-2">Jumlah Hadir</label>
+                                <input type="number" id="guestCount" min="1" value="1" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="guestMessage" class="block text-sm font-medium text-gray-700 mb-2">Ucapan (Opsional)</label>
+                            <textarea id="guestMessage" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" placeholder="Ucapan selamat..."></textarea>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button type="button" onclick="hideManualCheckin()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Batal</button>
+                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg">Check-in</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Messages Section -->
+            <section id="messagesSection" class="section hidden p-6">
+                <h2 class="text-2xl font-bold mb-6">Ucapan & Doa</h2>
+                <div id="messagesList" class="space-y-4">
+                    <!-- Messages will be populated here -->
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analyticsSection" class="section hidden p-6">
+                <h2 class="text-2xl font-bold mb-6">Grafik & Analitik</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <h3 class="text-lg font-semibold mb-4">Check-in per Jam</h3>
+                        <canvas id="hourlyChart"></canvas>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <h3 class="text-lg font-semibold mb-4">Status Kehadiran</h3>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Database Section -->
+            <section id="databaseSection" class="section hidden p-6">
+                <h2 class="text-2xl font-bold mb-6">Database Tamu</h2>
+                
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-4 bg-gray-50 border-b">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-semibold">Data Tamu</h3>
+                            <button onclick="exportData()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                                📥 Export CSV
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Nama</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Jumlah</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Waktu</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Ucapan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="guestTableBody">
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settingsSection" class="section hidden p-6">
+                <h2 class="text-2xl font-bold mb-6">Pengaturan</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Operator Settings -->
+                    <div id="operatorSettings" class="bg-white rounded-xl p-6 shadow-lg">
+                        <h3 class="text-lg font-semibold mb-4">Pengaturan Operator</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label for="eventDateTime" class="block text-sm font-medium text-gray-700 mb-2">Tanggal & Waktu Acara</label>
+                                <input type="datetime-local" id="eventDateTime" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            </div>
+                            
+                            <div>
+                                <label for="musicFile" class="block text-sm font-medium text-gray-700 mb-2">Musik Latar</label>
+                                <input type="file" id="musicFile" accept="audio/*" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                            
+                            <div>
+                                <label for="musicVolume" class="block text-sm font-medium text-gray-700 mb-2">Volume Musik</label>
+                                <input type="range" id="musicVolume" min="0" max="100" value="50" class="w-full">
+                                <span id="volumeValue" class="text-sm text-gray-600">50%</span>
+                            </div>
+                            
+                            <div>
+                                <label for="themeSelect" class="block text-sm font-medium text-gray-700 mb-2">Pilihan Tema</label>
+                                <select id="themeSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                    <option value="purple">Purple Gradient</option>
+                                    <option value="gold">Gold Gradient</option>
+                                    <option value="blue">Blue Ocean</option>
+                                    <option value="pink">Pink Romance</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button onclick="saveOperatorSettings()" class="w-full mt-6 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700">
+                            Simpan Pengaturan
+                        </button>
+                    </div>
+                    
+                    <!-- Admin Settings -->
+                    <div id="adminSettings" class="hidden bg-white rounded-xl p-6 shadow-lg">
+                        <h3 class="text-lg font-semibold mb-4">Pengaturan Admin</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label for="newGuestbookUrl" class="block text-sm font-medium text-gray-700 mb-2">Generate URL Buku Tamu Baru</label>
+                                <div class="flex space-x-2">
+                                    <input type="text" id="newGuestbookUrl" placeholder="nama-acara" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg">
+                                    <button onclick="generateNewUrl()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Generate</button>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="backgroundImage" class="block text-sm font-medium text-gray-700 mb-2">Foto Background Home</label>
+                                <input type="file" id="backgroundImage" accept="image/*" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="brideName1" class="block text-sm font-medium text-gray-700 mb-2">Nama Mempelai 1</label>
+                                    <input type="text" id="brideName1" value="Sarah" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label for="brideName2" class="block text-sm font-medium text-gray-700 mb-2">Nama Mempelai 2</label>
+                                    <input type="text" id="brideName2" value="Ahmad" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="newUsername" class="block text-sm font-medium text-gray-700 mb-2">Username Baru</label>
+                                <input type="text" id="newUsername" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                            
+                            <div>
+                                <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-2">Password Baru</label>
+                                <input type="password" id="newPassword" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+                        
+                        <button onclick="saveAdminSettings()" class="w-full mt-6 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">
+                            Simpan Pengaturan Admin
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section id="aboutSection" class="section hidden p-6">
+                <h2 class="text-2xl font-bold mb-6">About Us</h2>
+                
+                <div class="bg-white rounded-xl p-8 shadow-lg text-center">
+                    <div class="mb-6">
+                        <h3 class="font-playfair text-3xl font-bold text-purple-600 mb-2">Wedding Guest Book Digital</h3>
+                        <p class="text-gray-600">Sistem Buku Tamu Digital Modern</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                        <div class="p-4">
+                            <div class="text-2xl mb-2">🌐</div>
+                            <h4 class="font-semibold mb-1">Website</h4>
+                            <p class="text-sm text-gray-600">weddingbook.digital</p>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="text-2xl mb-2">📱</div>
+                            <h4 class="font-semibold mb-1">WhatsApp</h4>
+                            <p class="text-sm text-gray-600">+62 812-3456-7890</p>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="text-2xl mb-2">📷</div>
+                            <h4 class="font-semibold mb-1">Instagram</h4>
+                            <p class="text-sm text-gray-600">@weddingbook.digital</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 p-4 bg-purple-50 rounded-lg">
+                        <p class="text-sm text-gray-700">
+                            Terima kasih telah menggunakan layanan kami. Semoga acara pernikahan Anda berjalan lancar dan penuh berkah.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Message Popup -->
+    <div id="messagePopup" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md">
+            <div class="text-center mb-4">
+                <div class="text-4xl mb-2">💌</div>
+                <h3 class="font-playfair text-xl font-bold">Ucapan Baru</h3>
+            </div>
+            <div id="popupMessageContent" class="text-center">
+                <!-- Message content will be inserted here -->
+            </div>
+            <button onclick="closeMessagePopup()" class="w-full mt-4 bg-purple-600 text-white py-2 px-4 rounded-lg">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- Audio element for background music -->
+    <audio id="backgroundMusic" loop></audio>
+
+    <script>
+        // Database simulation using localStorage
+        let currentUser = null;
+        let userRole = null;
+        let guestData = JSON.parse(localStorage.getItem('guestData')) || [];
+        let settings = JSON.parse(localStorage.getItem('weddingSettings')) || {
+            brideName1: 'Sarah',
+            brideName2: 'Ahmad',
+            weddingDate: '2024-12-15',
+            adminUsername: 'admin',
+            adminPassword: 'admin123',
+            theme: 'purple',
+            musicVolume: 50
         };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(seed));
-        return seed;
-      }
-      try { return JSON.parse(raw); } catch (e) { return { clients: [], activeClient: null }; }
-    }
-    function saveData(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
 
-    let DB = loadData();
-    let activeClientId = DB.activeClient || (DB.clients[0] && DB.clients[0].id);
-    let role = null;
-    let operatorName = null;
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            loadSettings();
+        });
 
-    /* ===========================
-       Elements
-       =========================== */
-    const splash = document.getElementById('splash');
-    const loginModal = document.getElementById('loginModal');
-    const btnLoginAdmin = document.getElementById('btnLoginAdmin');
-    const openOpName = document.getElementById('openOpName');
-    const opNameArea = document.getElementById('opNameArea');
-    const loginOptions = document.getElementById('loginOptions');
-    const btnCancelOp = document.getElementById('btnCancelOp');
-    const btnLoginOp = document.getElementById('btnLoginOp');
-    const opNameInput = document.getElementById('opNameInput');
-    const adminPassInput = document.getElementById('adminPass');
-
-    const app = document.getElementById('app');
-    const navBtns = document.querySelectorAll('.navBtn');
-    const sections = document.querySelectorAll('.section');
-    const sidebar = document.getElementById('sidebar');
-    const btnToggleNav = document.getElementById('btnToggleNav');
-    const headerUser = document.getElementById('headerUser');
-    const displayRole = document.getElementById('displayRole');
-    const operatorNameDisplay = document.getElementById('operatorNameDisplay');
-
-    const bgHero = document.getElementById('bgHero');
-    const homeNames = document.getElementById('homeNames');
-    const homeSambutan = document.getElementById('homeSambutan');
-    const homeTotal = document.getElementById('homeTotal');
-    const homePresent = document.getElementById('homePresent');
-    const homeMsgs = document.getElementById('homeMsgs');
-    const homeLatestMsgs = document.getElementById('homeLatestMsgs');
-    const countdownWrap = document.getElementById('countdownWrap');
-
-    const bgUpload = document.getElementById('bgUpload');
-    const musicUpload = document.getElementById('musicUpload');
-    const volumeControl = document.getElementById('volumeControl');
-    const playMusicBtn = document.getElementById('playMusic');
-    const pauseMusicBtn = document.getElementById('pauseMusic');
-    const audioEl = document.getElementById('bgAudio');
-
-    const setDateEl = document.getElementById('setDate');
-    const setNamesEl = document.getElementById('setNames');
-    const setPhotoEl = document.getElementById('setPhoto');
-    const setAdminPassEl = document.getElementById('setAdminPass');
-
-    const themeSelect = document.getElementById('themeSelect');
-    const customThemeInputs = document.getElementById('customThemeInputs');
-    const customPrimary = document.getElementById('customPrimary');
-    const customAccent = document.getElementById('customAccent');
-
-    /* ===========================
-       Login handlers
-       =========================== */
-    openOpName.addEventListener('click', () => {
-      loginOptions.classList.add('hidden');
-      opNameArea.classList.remove('hidden');
-    });
-    btnCancelOp.addEventListener('click', () => {
-      opNameArea.classList.add('hidden');
-      loginOptions.classList.remove('hidden');
-    });
-    btnLoginAdmin.addEventListener('click', () => {
-      const val = adminPassInput.value.trim();
-      const adminPass = DB.clients.find(c => c.id === activeClientId)?.adminPass || DEFAULT_ADMIN_PASS;
-      if (val === adminPass) {
-        role = 'admin';
-        sessionStorage.setItem('role', role);
-        operatorName = null;
-        sessionStorage.removeItem('operatorName');
-        initApp();
-        loginModal.style.display = 'none';
-      } else alert('Password admin salah');
-    });
-    btnLoginOp.addEventListener('click', () => {
-      const name = opNameInput.value.trim();
-      if (!name) return alert('Masukkan nama operator');
-      role = 'operator';
-      operatorName = name;
-      sessionStorage.setItem('role', role);
-      sessionStorage.setItem('operatorName', operatorName);
-      const client = DB.clients.find(c => c.id === activeClientId);
-      if (client && !client.operators.includes(name)) { client.operators.push(name); saveData(DB); }
-      initApp();
-      loginModal.style.display = 'none';
-    });
-
-    /* ===========================
-       Init app
-       =========================== */
-    function initApp() {
-      app.classList.remove('hidden');
-      headerUser.textContent = role === 'admin' ? 'Admin' : `Operator: ${operatorName || ''}`;
-      displayRole.textContent = role === 'admin' ? 'Admin' : 'Operator';
-      operatorNameDisplay.textContent = operatorName ? `Operator: ${operatorName}` : '';
-      toggleAdminControls();
-      renderClientInfo();
-      renderHome();
-      renderDb();
-      renderMessages();
-      renderOperators();
-      initCharts();
-      showSection('home');
-      startAutoRefresh();
-      applyClientTheme();
-      hideSplash();
-    }
-
-    /* show/hide admin only controls */
-    function toggleAdminControls() {
-      const adminEls = document.querySelectorAll('#adminOnly_name, #adminOnly_bg, #adminOnly_pass, #adminOnly_photoUrl');
-      adminEls.forEach(el => {
-        if (role === 'admin') el.style.display = '';
-        else el.style.display = 'none';
-      });
-      // create/reset buttons
-      document.getElementById('createBook').style.display = role === 'admin' ? '' : 'none';
-      document.getElementById('resetClient').style.display = role === 'admin' ? '' : 'none';
-    }
-
-    /* ===========================
-       Render client info & home
-       =========================== */
-    function renderClientInfo() {
-      const client = DB.clients.find(c => c.id === activeClientId);
-      if (!client) return;
-      document.getElementById('sidebarEventName').textContent = client.name || 'Wedding Guestbook';
-      document.getElementById('currentBookName').textContent = client.name || 'Default';
-      homeNames.textContent = (client.groom || 'Nama A') + ' & ' + (client.bride || 'Nama B');
-      homeSambutan.textContent = 'Terima kasih atas kehadiran — silakan check-in atau tinggalkan ucapan.';
-      const bg = client.bgDataUrl || client.photo || '';
-      if (bg) bgHero.style.backgroundImage = `url('${bg}')`;
-      if (client.music) { audioEl.src = client.music; }
-      if (client.date) setDateEl.value = client.date;
-      const vol = localStorage.getItem('bgAudioVolume');
-      if (vol) { volumeControl.value = vol; audioEl.volume = parseFloat(vol); }
-      applyClientTheme();
-    }
-
-    /* Home render */
-    function renderHome() {
-      const client = DB.clients.find(c => c.id === activeClientId);
-      if (!client) return;
-      homeTotal.textContent = client.guests.length || 0;
-      homePresent.textContent = client.guests.filter(g => g.status === 'Hadir').length || 0;
-      homeMsgs.textContent = client.messages.length || 0;
-      homeLatestMsgs.innerHTML = '';
-      client.messages.slice().reverse().slice(0, 5).forEach(m => {
-        const d = document.createElement('div');
-        d.className = 'p-3 bg-white round-md';
-        d.innerHTML = `<div class="font-semibold">${escapeHtml(m.name || 'Anonim')}</div><div class="text-sm mt-1">${escapeHtml(m.text)}</div><div class="text-xs text-gray-500 mt-2">${m.time}</div>`;
-        homeLatestMsgs.appendChild(d);
-      });
-      renderCountdown();
-    }
-
-    /* ===========================
-       Navigation & sidebar toggle
-       =========================== */
-    navBtns.forEach(btn => btn.addEventListener('click', () => showSection(btn.dataset.section)));
-    function showSection(id) {
-      sections.forEach(s => s.classList.add('hidden'));
-      const el = document.querySelector(`[data-section-id="${id}"]`);
-      if (el) el.classList.remove('hidden');
-    }
-    let navHidden = false;
-    btnToggleNav.addEventListener('click', () => {
-      navHidden = !navHidden;
-      if (navHidden) { sidebar.classList.add('sidebar-hidden'); }
-      else { sidebar.classList.remove('sidebar-hidden'); }
-    });
-
-    /* ===========================
-       Logout
-       =========================== */
-    document.getElementById('btnLogout').addEventListener('click', () => {
-      sessionStorage.removeItem('role'); sessionStorage.removeItem('operatorName');
-      role = null; operatorName = null; location.reload();
-    });
-
-    /* ===========================
-       QR scan (camera)
-       =========================== */
-    const video = document.getElementById('scanVideo');
-    const canvas = document.getElementById('scanCanvas');
-    const ctx = canvas.getContext && canvas.getContext('2d');
-    let stream = null, scanning = false;
-    async function startCamera() {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        video.srcObject = stream; await video.play();
-        scanning = true; scanLoop();
-      } catch (e) { alert('Gagal akses kamera: ' + e.message); }
-    }
-    function stopCamera() { scanning = false; if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } }
-    function scanLoop() {
-      if (!scanning) return;
-      if (video.readyState === video.HAVE_ENOUGH_DATA && ctx) {
-        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0);
-        const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(image.data, image.width, image.height, { inversionAttempts: 'dontInvert' });
-        if (code) {
-          document.getElementById('scanStatus').textContent = 'Kode: ' + code.data; handleCheckInById(code.data); scanning = false;
-          setTimeout(() => { scanning = true; scanLoop(); }, 1500); return;
+        // Login functions
+        function showOperatorLogin() {
+            document.getElementById('operatorModal').classList.remove('hidden');
+            document.getElementById('operatorModal').classList.add('flex');
         }
-      }
-      requestAnimationFrame(scanLoop);
-    }
-    document.getElementById('startScan').addEventListener('click', () => startCamera());
-    document.getElementById('stopScan').addEventListener('click', () => { stopCamera(); document.getElementById('scanStatus').textContent = ''; });
 
-    /* ===========================
-       Check-in & guest submit
-       =========================== */
-    function handleCheckInById(id) {
-      const client = DB.clients.find(c => c.id === activeClientId);
-      const g = client.guests.find(x => x.id === id);
-      if (g) {
-        g.status = 'Hadir'; g.time = new Date().toLocaleString();
-        saveData(DB); renderDb(); renderHome(); renderMessages(); updateCharts();
-        alert('Check-in: ' + g.name);
-      } else alert('Tamu tidak terdaftar: ' + id);
-    }
-
-    document.getElementById('btnGuestSubmit').addEventListener('click', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('guestNameFill').value.trim();
-      const jumlah = parseInt(document.getElementById('guestCountFill').value) || 1;
-      const contact = document.getElementById('guestContactFill').value.trim();
-      const ucapan = document.getElementById('guestUcapanFill').value.trim();
-      if (!name) return alert('Nama wajib');
-      const client = DB.clients.find(c => c.id === activeClientId);
-      const id = uid('G');
-      const guest = { id, name, contact, jumlah, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString(), status: 'Hadir', ucapan };
-      client.guests.push(guest);
-      if (ucapan) client.messages.push({ name, text: ucapan, time: new Date().toLocaleString() });
-      saveData(DB); renderDb(); renderHome(); renderMessages(); renderRecentCheckins(); genQR(id, document.getElementById('guestQrPreview'));
-    });
-
-    /* ===========================
-       QR generate & DB render
-       =========================== */
-    function genQR(payload, container) {
-      container.innerHTML = ''; const c = document.createElement('canvas'); container.appendChild(c);
-      QRCode.toCanvas(c, payload, { width: 180 }, err => { if (err) container.textContent = 'Gagal generate QR'; });
-    }
-
-    function renderRecentCheckins() {
-      const box = document.getElementById('checkinRecent'); box.innerHTML = '';
-      const client = DB.clients.find(c => c.id === activeClientId);
-      client.guests.slice().reverse().slice(0, 8).forEach(g => {
-        const d = document.createElement('div'); d.className = 'p-2 bg-white round-md';
-        d.innerHTML = `<div class="font-semibold">${g.name}</div><div class="text-xs text-gray-500">${g.time} • ${g.jumlah} orang</div>`;
-        box.appendChild(d);
-      });
-    }
-
-    function renderDb(filter = '') {
-      const tbody = document.getElementById('dbTbody'); tbody.innerHTML = '';
-      const client = DB.clients.find(c => c.id === activeClientId); if (!client) return;
-      client.guests.forEach(g => {
-        if (filter && !(g.name.toLowerCase().includes(filter) || g.id.toLowerCase().includes(filter))) return;
-        const tr = document.createElement('tr'); tr.innerHTML = `<td class="px-3 py-2">${g.id}</td><td class="px-3 py-2">${g.name}</td><td class="px-3 py-2">${g.contact || '-'}</td><td class="px-3 py-2">${g.jumlah || 1}</td><td class="px-3 py-2">${g.date || '-'}</td><td class="px-3 py-2">${g.time || '-'}</td><td class="px-3 py-2">${g.status || 'Belum'}</td><td class="px-3 py-2">${g.ucapan ? g.ucapan.slice(0, 40) : '-'}</td><td class="px-3 py-2"><button data-id="${g.id}" class="editBtn px-2 py-1 rounded-md border">Edit</button> <button data-id="${g.id}" class="qrBtn px-2 py-1 rounded-md border">QR</button></td>`;
-        tbody.appendChild(tr);
-      });
-    }
-    document.getElementById('searchInput').addEventListener('input', e => renderDb(e.target.value.toLowerCase()));
-
-    document.addEventListener('click', e => {
-      if (e.target.matches('.qrBtn')) {
-        const id = e.target.dataset.id;
-        const modal = document.createElement('div'); modal.className = 'fixed inset-0 flex items-center justify-center bg-black/40';
-        const card = document.createElement('div'); card.className = 'bg-white p-6 rounded-md';
-        const c = document.createElement('canvas'); card.appendChild(c);
-        QRCode.toCanvas(c, id, { width: 240 }, () => { });
-        const close = document.createElement('button'); close.className = 'mt-3 px-3 py-1 rounded-md border'; close.textContent = 'Tutup';
-        close.addEventListener('click', () => document.body.removeChild(modal));
-        card.appendChild(close); modal.appendChild(card); document.body.appendChild(modal);
-      }
-      if (e.target.matches('.editBtn')) {
-        const id = e.target.dataset.id; const client = DB.clients.find(c => c.id === activeClientId); const guest = client.guests.find(x => x.id === id);
-        const newName = prompt('Nama', guest.name); if (newName !== null) { guest.name = newName; saveData(DB); renderDb(); renderHome(); }
-      }
-      if (e.target && e.target.dataset && e.target.dataset.op) {
-        const op = e.target.dataset.op; const client = DB.clients.find(c => c.id === activeClientId);
-        client.operators = client.operators.filter(x => x !== op); saveData(DB); renderOperators();
-      }
-    });
-
-    /* Export CSV */
-    document.getElementById('exportCsvBtn').addEventListener('click', () => {
-      const client = DB.clients.find(c => c.id === activeClientId);
-      const rows = [['id', 'name', 'contact', 'jumlah', 'date', 'time', 'status', 'ucapan']];
-      client.guests.forEach(g => rows.push([g.id, g.name, g.contact, g.jumlah, g.date, g.time, g.status, g.ucapan]));
-      const csv = rows.map(r => r.map(cell => `"${String(cell || '').replace(/"/g, '""')}"`).join(',')).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv' }); const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = `guests-${client.id}.csv`; a.click(); URL.revokeObjectURL(url);
-    });
-
-    /* ===========================
-       Messages render & popup
-       =========================== */
-    function renderMessages() {
-      const list = document.getElementById('msgList'); list.innerHTML = '';
-      const client = DB.clients.find(c => c.id === activeClientId);
-      client.messages.slice().reverse().forEach(m => {
-        const card = document.createElement('div'); card.className = 'p-3 bg-white round-md';
-        card.innerHTML = `<div class="font-semibold">${escapeHtml(m.name || 'Anonim')}</div><div class="text-sm text-gray-700 mt-1">${escapeHtml(m.text)}</div><div class="text-xs text-gray-500 mt-2">${m.time}</div>`;
-        list.appendChild(card);
-      });
-    }
-
-    function showPopup(msgs) {
-      const full = document.getElementById('fullPopup'); const inner = document.getElementById('fullPopupInner'); inner.innerHTML = '';
-      msgs.forEach(m => {
-        const el = document.createElement('div'); el.className = 'p-6 bg-white text-black round-md';
-        el.innerHTML = `<div class="font-Outfit text-xl">${escapeHtml(m.name)}</div><div class="mt-2 text-lg">${escapeHtml(m.text)}</div>`;
-        inner.appendChild(el);
-      });
-      full.classList.remove('hidden');
-    }
-    document.getElementById('showPopupBtn').addEventListener('click', () => {
-      const client = DB.clients.find(c => c.id === activeClientId); const latest = client.messages.slice(-5);
-      if (latest.length === 0) return alert('Belum ada ucapan'); showPopup(latest);
-    });
-    document.getElementById('hidePopupBtn').addEventListener('click', () => document.getElementById('fullPopup').classList.add('hidden'));
-    document.getElementById('fullPopup').addEventListener('click', () => document.getElementById('fullPopup').classList.add('hidden'));
-
-    /* ===========================
-       Settings save / operators
-       =========================== */
-    function renderOperators() { const el = document.getElementById('opList'); el.innerHTML = ''; const client = DB.clients.find(c => c.id === activeClientId); client.operators.forEach(o => { const d = document.createElement('div'); d.className = 'flex items-center justify-between p-2 border rounded-md'; d.innerHTML = `<div>${o}</div><button class="px-2 py-1 rounded-md border" data-op="${o}">Hapus</button>`; el.appendChild(d); }); }
-
-    document.getElementById('saveSettings').addEventListener('click', () => {
-      const client = DB.clients.find(c => c.id === activeClientId);
-      if (role === 'admin') {
-        const names = setNamesEl.value.trim();
-        if (names) { const parts = names.split('&').map(s => s.trim()); client.groom = parts[0] || client.groom; client.bride = parts[1] || client.bride; client.name = names; }
-        const p = setPhotoEl.value.trim(); if (p) client.photo = p;
-        const newPass = setAdminPassEl.value.trim(); if (newPass) client.adminPass = newPass;
-      }
-      const d = setDateEl.value; if (d) client.date = d;
-      if (audioEl && audioEl.src) client.music = audioEl.src;
-      const themeVal = themeSelect.value;
-      if (themeVal === 'custom') { const p = customPrimary.value.trim(), a = customAccent.value.trim(); if (p && a) client.theme = `${p}|${a}`; }
-      else client.theme = themeVal;
-      saveData(DB); renderClientInfo(); alert('Pengaturan disimpan'); applyClientTheme();
-    });
-
-    /* create client */
-    document.getElementById('createBook').addEventListener('click', () => {
-      if (role !== 'admin') return alert('Hanya Admin yang dapat membuat client baru');
-      const id = uid('client'); const name = prompt('Nama client (mis: Dimas & Rara)') || 'Client ' + id;
-      const parts = name.split('&').map(s => s.trim()); const groom = parts[0] || 'Nama A'; const bride = parts[1] || 'Nama B';
-      const c = { id, name, groom, bride, photo: '', date: '', adminPass: DEFAULT_ADMIN_PASS, operators: [], guests: [], messages: [], music: '', bgDataUrl: '', theme: 'default' };
-      DB.clients.push(c); DB.activeClient = id; activeClientId = id; saveData(DB); renderClientInfo(); renderDb(); renderMessages(); renderOperators(); alert('Client baru dibuat: ' + name);
-    });
-
-    /* reset client */
-    document.getElementById('resetClient').addEventListener('click', () => {
-      if (role !== 'admin') return alert('Hanya Admin yang dapat mereset data');
-      if (!confirm('Reset semua data client ini?')) return;
-      const client = DB.clients.find(c => c.id === activeClientId); client.guests = []; client.messages = []; saveData(DB); renderDb(); renderMessages(); renderHome(); updateCharts(); alert('Data client direset');
-    });
-
-    /* ===========================
-       Charts
-       =========================== */
-    let chartGuests = null, chartMsgs = null;
-    function initCharts() {
-      try {
-        const ctxG = document.getElementById('chartGuests').getContext('2d');
-        const ctxM = document.getElementById('chartMsgs').getContext('2d');
-        chartGuests = new Chart(ctxG, { type: 'bar', data: { labels: [], datasets: [{ label: 'Hadir per jam', data: [], backgroundColor: 'rgba(124,58,237,0.7)' }] }, options: { responsive: true } });
-        chartMsgs = new Chart(ctxM, { type: 'line', data: { labels: [], datasets: [{ label: 'Ucapan per jam', data: [], fill: false, borderColor: 'rgb(236,72,153)' }] }, options: { responsive: true } });
-        updateCharts();
-      } catch (e) { }
-    }
-    function updateCharts() {
-      const client = DB.clients.find(c => c.id === activeClientId); if (!client) return;
-      const now = new Date(); const labels = []; for (let i = 23; i >= 0; i--) { const d = new Date(now.getTime() - i * 3600 * 1000); labels.push(d.getHours() + ':00'); }
-      const guestsPerHour = labels.map(() => 0); const msgsPerHour = labels.map(() => 0);
-      client.guests.forEach(g => { if (!g.time) return; const t = new Date(g.time); const diff = Math.floor((now - t) / 3600000); if (diff >= 0 && diff < 24) { const idx = 23 - diff; guestsPerHour[idx] += (g.jumlah || 1); } });
-      client.messages.forEach(m => { if (!m.time) return; const t = new Date(m.time); const diff = Math.floor((now - t) / 3600000); if (diff >= 0 && diff < 24) { const idx = 23 - diff; msgsPerHour[idx] += 1; } });
-      if (chartGuests) { chartGuests.data.labels = labels; chartGuests.data.datasets[0].data = guestsPerHour; chartGuests.update(); }
-      if (chartMsgs) { chartMsgs.data.labels = labels; chartMsgs.data.datasets[0].data = msgsPerHour; chartMsgs.update(); }
-    }
-
-    /* ===========================
-       Auto refresh
-       =========================== */
-    let autoRefreshTimer = null;
-    function startAutoRefresh() { if (autoRefreshTimer) clearInterval(autoRefreshTimer); autoRefreshTimer = setInterval(() => { DB = loadData(); activeClientId = DB.activeClient || activeClientId; renderClientInfo(); renderHome(); renderDb(); renderMessages(); renderRecentCheckins(); updateCharts(); }, 5000); }
-
-    /* ===========================
-       Utilities
-       =========================== */
-   function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  }[c]));
-}
-
-/* ===========================
-   Audio & upload handling
-   =========================== */
-if(bgUpload) {
-          bgUpload.addEventListener('change', (e) => {
-            if (role !== 'admin') { alert('Hanya Admin yang dapat mengganti foto'); return; }
-            const file = e.target.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = () => { const dataUrl = reader.result; const client = DB.clients.find(c => c.id === activeClientId); client.bgDataUrl = dataUrl; saveData(DB); bgHero.style.backgroundImage = `url('${dataUrl}')`; alert('Foto latar berhasil diupload'); };
-            reader.readAsDataURL(file);
-          });
+        function showAdminLogin() {
+            document.getElementById('adminModal').classList.remove('hidden');
+            document.getElementById('adminModal').classList.add('flex');
         }
-if(musicUpload) {
-          musicUpload.addEventListener('change', (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { audioEl.src = reader.result; audioEl.play().catch(() => { }); const client = DB.clients.find(c => c.id === activeClientId); client.music = reader.result; saveData(DB); alert('Musik berhasil diupload'); }; reader.readAsDataURL(file); });
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.getElementById(modalId).classList.remove('flex');
         }
-volumeControl.addEventListener('input', (e) => { audioEl.volume = parseFloat(e.target.value); localStorage.setItem('bgAudioVolume', e.target.value); });
-        playMusicBtn.addEventListener('click', () => audioEl.play().catch(() => { }));
-        pauseMusicBtn.addEventListener('click', () => audioEl.pause());
 
-        /* Restore & splash */
-        function hideSplash(){ setTimeout(()=> { splash.classList.add('hidden'); }, 800);
-    }
-    window.addEventListener('load', () => {
-      DB = loadData(); activeClientId = DB.activeClient || activeClientId;
-      const savedRole = sessionStorage.getItem('role'); const savedOp = sessionStorage.getItem('operatorName');
-      if (savedRole) { role = savedRole; operatorName = savedOp || null; initApp(); loginModal.style.display = 'none'; }
-      else {
-        // show login
-        loginModal.style.display = '';
-      }
-      renderClientInfo();
-      // hide splash after minimal load
-      hideSplash();
-    });
+        function loginOperator(event) {
+            event.preventDefault();
+            const name = document.getElementById('operatorName').value;
+            if (name.trim()) {
+                currentUser = name;
+                userRole = 'operator';
+                document.getElementById('currentUser').textContent = `Operator: ${name}`;
+                showDashboard();
+                closeModal('operatorModal');
+            }
+        }
 
-    /* ===========================
-       Countdown
-       =========================== */
-    let countdownTimer = null;
-    function renderCountdown() {
-      const client = DB.clients.find(c => c.id === activeClientId); if (!client) return;
-      const wrap = countdownWrap; wrap.innerHTML = '';
-      if (!client.date) { wrap.innerHTML = '<div class="text-sm text-gray-500">Tanggal acara belum diset.</div>'; return; }
-      function update() {
-        const now = new Date(); const dest = new Date(client.date);
-        let diff = dest.getTime() - now.getTime();
-        if (diff <= 0) { wrap.innerHTML = '<div class="text-sm text-gray-500">Acara sudah berlangsung / sudah lewat.</div>'; clearInterval(countdownTimer); return; }
-        const days = Math.floor(diff / 86400000); diff -= days * 86400000;
-        const hours = Math.floor(diff / 3600000); diff -= hours * 3600000;
-        const mins = Math.floor(diff / 60000); diff -= mins * 60000;
-        const secs = Math.floor(diff / 1000);
-        wrap.innerHTML = `<div class="countdown"><div class="item"><div class="text-sm font-semibold">${days}</div><div class="text-xs text-gray-500">Hari</div></div><div class="item"><div class="text-sm font-semibold">${hours}</div><div class="text-xs text-gray-500">Jam</div></div><div class="item"><div class="text-sm font-semibold">${mins}</div><div class="text-xs text-gray-500">Menit</div></div><div class="item"><div class="text-sm font-semibold">${secs}</div><div class="text-xs text-gray-500">Detik</div></div></div>`;
-      }
-      update(); if (countdownTimer) clearInterval(countdownTimer); countdownTimer = setInterval(update, 1000);
-    }
+        function loginAdmin(event) {
+            event.preventDefault();
+            const username = document.getElementById('adminName').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (username === settings.adminUsername && password === settings.adminPassword) {
+                currentUser = username;
+                userRole = 'admin';
+                document.getElementById('currentUser').textContent = `Admin: ${username}`;
+                showDashboard();
+                closeModal('adminModal');
+            } else {
+                alert('Username atau password salah!');
+            }
+        }
 
-    /* ===========================
-       Theme handling
-       =========================== */
-    const THEMES = {
-      'default': { primary: '#111827', accent: '#7c3aed', bg: '#fbfbfe', overlay: 'rgba(255,255,255,0.35)' },
-      'soft-pink': { primary: '#111827', accent: '#ec4899', bg: '#fff7fb', overlay: 'rgba(236,72,153,0.08)' },
-      'gold-cream': { primary: '#111827', accent: '#d4af37', bg: '#fffaf0', overlay: 'rgba(212,175,55,0.08)' },
-      'blue-silver': { primary: '#111827', accent: '#2563eb', bg: '#f8fbff', overlay: 'rgba(37,99,235,0.06)' },
-      'sage-green': { primary: '#111827', accent: '#6b8f66', bg: '#fbfefb', overlay: 'rgba(107,143,102,0.06)' }
-    };
+        function showDashboard() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            
+            // Show/hide settings based on role
+            if (userRole === 'admin') {
+                document.getElementById('adminSettings').classList.remove('hidden');
+            } else {
+                document.getElementById('adminSettings').classList.add('hidden');
+            }
+            
+            showSection('home');
+            updateStats();
+            initCharts();
+        }
 
-    function applyClientTheme() {
-      const client = DB.clients.find(c => c.id === activeClientId); if (!client) return;
-      const t = client.theme || 'default';
-      if (typeof t === 'string' && t.includes('|')) { const [p, a] = t.split('|'); setThemeVars(p, a, `${p}44`); return; }
-      const obj = THEMES[t] || THEMES['default']; setThemeVars(obj.primary, obj.accent, obj.overlay);
-      if (themeSelect) themeSelect.value = t;
-      if (t === 'custom') customThemeInputs.classList.remove('hidden'); else customThemeInputs.classList.add('hidden');
-    }
+        function logout() {
+            currentUser = null;
+            userRole = null;
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            
+            // Reset forms
+            document.getElementById('operatorName').value = '';
+            document.getElementById('adminName').value = '';
+            document.getElementById('adminPassword').value = '';
+        }
 
-    function setThemeVars(primary, accent, overlay) {
-      document.documentElement.style.setProperty('--primary', primary || '#111827');
-      document.documentElement.style.setProperty('--accent', accent || '#7c3aed');
-      document.documentElement.style.setProperty('--bg-soft', '#fbfbfe');
-      document.documentElement.style.setProperty('--overlay', overlay || 'rgba(12,12,18,0.35)');
-      document.documentElement.style.setProperty('--accent-color', accent || '#7c3aed');
-      document.querySelectorAll('.btn-accent').forEach(b => {
-        b.style.background = `linear-gradient(90deg, ${accent}, ${shadeColor(accent, -18)})`;
-        b.style.color = '#fff';
-      });
-    }
-    function shadeColor(hex, percent) {
-      try {
-        const f = hex.slice(1), t = percent < 0 ? 0 : 255, p = percent < 0 ? percent * -1 : percent;
-        const R = parseInt(f.substring(0, 2), 16), G = parseInt(f.substring(2, 4), 16), B = parseInt(f.substring(4, 6), 16);
-        const newR = Math.round((t - R) * p / 100) + R;
-        const newG = Math.round((t - G) * p / 100) + G;
-        const newB = Math.round((t - B) * p / 100) + B;
-        return `#${(0x1000000 + (newR << 16) + (newG << 8) + newB).toString(16).slice(1)}`;
-      } catch (e) { return hex; }
-    }
+        // Navigation functions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            if (sidebar.classList.contains('sidebar-hidden')) {
+                sidebar.classList.remove('sidebar-hidden');
+                sidebar.classList.add('sidebar-visible');
+                mainContent.classList.remove('ml-0');
+                mainContent.classList.add('ml-64');
+            } else {
+                sidebar.classList.add('sidebar-hidden');
+                sidebar.classList.remove('sidebar-visible');
+                mainContent.classList.add('ml-0');
+                mainContent.classList.remove('ml-64');
+            }
+        }
 
-    if (themeSelect) {
-      themeSelect.addEventListener('change', (e) => {
-        const val = e.target.value; const client = DB.clients.find(c => c.id === activeClientId);
-        if (val === 'custom') { customThemeInputs.classList.remove('hidden'); client.theme = 'custom'; saveData(DB); return; }
-        customThemeInputs.classList.add('hidden'); client.theme = val; saveData(DB); applyClientTheme();
-      });
-    }
-    if (customPrimary && customAccent) {
-      function applyCustom() { const p = customPrimary.value.trim(), a = customAccent.value.trim(); if (!p || !a) return; const client = DB.clients.find(c => c.id === activeClientId); client.theme = `${p}|${a}`; saveData(DB); applyClientTheme(); }
-      customPrimary.addEventListener('change', applyCustom); customAccent.addEventListener('change', applyCustom);
-    }
+        function showSection(sectionName) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.add('hidden'));
+            
+            // Show selected section
+            document.getElementById(sectionName + 'Section').classList.remove('hidden');
+            
+            // Update nav buttons
+            const navButtons = document.querySelectorAll('.nav-btn');
+            navButtons.forEach(btn => btn.classList.remove('bg-white/20'));
+            event.target.classList.add('bg-white/20');
+            
+            // Load section-specific data
+            if (sectionName === 'messages') {
+                loadMessages();
+            } else if (sectionName === 'database') {
+                loadGuestTable();
+            } else if (sectionName === 'analytics') {
+                updateAnalytics();
+            }
+        }
 
-    /* ===========================
-       Helpers & final render
-       =========================== */
-    function renderOperators() { const el = document.getElementById('opList'); el.innerHTML = ''; const client = DB.clients.find(c => c.id === activeClientId); client.operators.forEach(o => { const d = document.createElement('div'); d.className = 'flex items-center justify-between p-2 border rounded-md'; d.innerHTML = `<div>${o}</div><button class="px-2 py-1 rounded-md border" data-op="${o}">Hapus</button>`; el.appendChild(d); }); }
+        // Check-in functions
+        function showQRScanner() {
+            document.getElementById('qrScannerDiv').classList.remove('hidden');
+            startQRScanner();
+        }
 
-    function hideSplashForce() { splash.classList.add('hidden'); }
+        function hideQRScanner() {
+            document.getElementById('qrScannerDiv').classList.add('hidden');
+            if (window.html5QrcodeScanner) {
+                window.html5QrcodeScanner.clear();
+            }
+        }
 
-    /* initial render */
-    renderClientInfo();
+        function startQRScanner() {
+            const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+                processQRCode(decodedText);
+                hideQRScanner();
+            };
 
-  </script>
-</body>
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            window.html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", config, false);
+            window.html5QrcodeScanner.render(qrCodeSuccessCallback);
+        }
 
+        function showManualQR() {
+            document.getElementById('manualQRDiv').classList.remove('hidden');
+        }
+
+        function hideManualQR() {
+            document.getElementById('manualQRDiv').classList.add('hidden');
+            document.getElementById('qrCode').value = '';
+            document.getElementById('qrCodeDisplay').classList.add('hidden');
+            document.getElementById('guestNameQR').value = '';
+            document.getElementById('guestCountQR').value = '1';
+        }
+
+        // QR Code Generation Functions
+        function generateQRCode(event) {
+            event.preventDefault();
+            
+            const guestName = document.getElementById('guestNameQR').value;
+            const guestCount = document.getElementById('guestCountQR').value;
+            const qrData = `${guestName}|${guestCount}`;
+            
+            // Generate QR Code
+            const qrCodeContainer = document.getElementById('qrCodeImage');
+            qrCodeContainer.innerHTML = ''; // Clear previous QR code
+            
+            QRCode.toCanvas(qrData, { 
+                width: 200, 
+                height: 200,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            }, function (error, canvas) {
+                if (error) {
+                    console.error(error);
+                    alert('Error generating QR code');
+                    return;
+                }
+                
+                qrCodeContainer.appendChild(canvas);
+                document.getElementById('qrGuestName').textContent = guestName;
+                document.getElementById('qrCodeDisplay').classList.remove('hidden');
+                
+                // Store current QR data for download/print
+                window.currentQRData = {
+                    data: qrData,
+                    guestName: guestName,
+                    guestCount: guestCount,
+                    canvas: canvas
+                };
+            });
+        }
+
+        function downloadQRCode() {
+            if (!window.currentQRData) {
+                alert('Tidak ada QR code untuk didownload');
+                return;
+            }
+            
+            const canvas = window.currentQRData.canvas;
+            const link = document.createElement('a');
+            link.download = `qr-code-${window.currentQRData.guestName.replace(/\s+/g, '-')}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        function printQRCode() {
+            if (!window.currentQRData) {
+                alert('Tidak ada QR code untuk diprint');
+                return;
+            }
+            
+            const printWindow = window.open('', '_blank');
+            const canvas = window.currentQRData.canvas;
+            const dataURL = canvas.toDataURL();
+            
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>QR Code - ${window.currentQRData.guestName}</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            text-align: center;
+                            padding: 20px;
+                        }
+                        .qr-container {
+                            border: 2px solid #000;
+                            padding: 20px;
+                            display: inline-block;
+                            margin: 20px;
+                        }
+                        .guest-info {
+                            margin-top: 15px;
+                            font-size: 18px;
+                            font-weight: bold;
+                        }
+                        .instructions {
+                            margin-top: 10px;
+                            font-size: 14px;
+                            color: #666;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>Wedding Guest Book</h1>
+                    <div class="qr-container">
+                        <img src="${dataURL}" alt="QR Code" />
+                        <div class="guest-info">
+                            ${window.currentQRData.guestName}<br>
+                            Jumlah Tamu: ${window.currentQRData.guestCount}
+                        </div>
+                        <div class="instructions">
+                            Scan QR code ini untuk check-in mandiri
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            printWindow.focus();
+            
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 250);
+        }
+
+        function processManualQR(event) {
+            event.preventDefault();
+            const qrCode = document.getElementById('qrCode').value;
+            processQRCode(qrCode);
+            hideManualQR();
+        }
+
+        function processQRCode(qrCode) {
+            // Simulate QR code processing
+            const guestInfo = parseQRCode(qrCode);
+            if (guestInfo) {
+                showGuestForm(guestInfo);
+            } else {
+                alert('QR Code tidak valid!');
+            }
+        }
+
+        function parseQRCode(qrCode) {
+            // Simple QR code format: NAME|COUNT
+            const parts = qrCode.split('|');
+            if (parts.length >= 2) {
+                return {
+                    name: parts[0],
+                    count: parseInt(parts[1]) || 1
+                };
+            }
+            return null;
+        }
+
+        function showGuestForm(guestInfo) {
+            const message = prompt(`Check-in untuk: ${guestInfo.name}\nJumlah: ${guestInfo.count}\n\nMasukkan ucapan (opsional):`);
+            
+            const guest = {
+                id: Date.now(),
+                name: guestInfo.name,
+                count: guestInfo.count,
+                datetime: new Date().toISOString(),
+                status: 'Hadir',
+                message: message || '',
+                checkinBy: currentUser
+            };
+            
+            guestData.push(guest);
+            localStorage.setItem('guestData', JSON.stringify(guestData));
+            
+            updateStats();
+            
+            if (message && message.trim()) {
+                showMessagePopup(guest);
+            }
+            
+            alert(`Check-in berhasil untuk ${guestInfo.name}!`);
+        }
+
+        function showManualCheckin() {
+            document.getElementById('manualCheckinDiv').classList.remove('hidden');
+        }
+
+        function hideManualCheckin() {
+            document.getElementById('manualCheckinDiv').classList.add('hidden');
+            document.getElementById('guestName').value = '';
+            document.getElementById('guestCount').value = '1';
+            document.getElementById('guestMessage').value = '';
+        }
+
+        function processManualCheckin(event) {
+            event.preventDefault();
+            
+            const guest = {
+                id: Date.now(),
+                name: document.getElementById('guestName').value,
+                count: parseInt(document.getElementById('guestCount').value),
+                datetime: new Date().toISOString(),
+                status: 'Hadir',
+                message: document.getElementById('guestMessage').value,
+                checkinBy: currentUser
+            };
+            
+            guestData.push(guest);
+            localStorage.setItem('guestData', JSON.stringify(guestData));
+            
+            updateStats();
+            hideManualCheckin();
+            
+            if (guest.message && guest.message.trim()) {
+                showMessagePopup(guest);
+            }
+            
+            alert(`Check-in berhasil untuk ${guest.name}!`);
+        }
+
+        // Message functions
+        function showMessagePopup(guest) {
+            const popup = document.getElementById('messagePopup');
+            const content = document.getElementById('popupMessageContent');
+            
+            content.innerHTML = `
+                <div class="mb-4">
+                    <h4 class="font-semibold text-lg">${guest.name}</h4>
+                    <p class="text-sm text-gray-600">${new Date(guest.datetime).toLocaleString('id-ID')}</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <p class="text-gray-800">${guest.message}</p>
+                </div>
+            `;
+            
+            popup.classList.remove('hidden');
+            popup.classList.add('flex');
+            
+            // Auto close after 5 seconds
+            setTimeout(() => {
+                closeMessagePopup();
+            }, 5000);
+        }
+
+        function closeMessagePopup() {
+            document.getElementById('messagePopup').classList.add('hidden');
+            document.getElementById('messagePopup').classList.remove('flex');
+        }
+
+        function loadMessages() {
+            const messagesList = document.getElementById('messagesList');
+            const messagesWithText = guestData.filter(guest => guest.message && guest.message.trim());
+            
+            if (messagesWithText.length === 0) {
+                messagesList.innerHTML = '<p class="text-gray-500 text-center py-8">Belum ada ucapan</p>';
+                return;
+            }
+            
+            messagesList.innerHTML = messagesWithText.map(guest => `
+                <div class="bg-white rounded-xl p-6 shadow-lg">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="font-semibold text-lg">${guest.name}</h4>
+                        <span class="text-sm text-gray-500">${new Date(guest.datetime).toLocaleString('id-ID')}</span>
+                    </div>
+                    <p class="text-gray-700 leading-relaxed">${guest.message}</p>
+                </div>
+            `).join('');
+        }
+
+        // Statistics and charts
+        function updateStats() {
+            const totalInvitations = guestData.length;
+            const totalCheckin = guestData.filter(g => g.status === 'Hadir').length;
+            const totalMessages = guestData.filter(g => g.message && g.message.trim()).length;
+            
+            document.getElementById('totalInvitations').textContent = totalInvitations;
+            document.getElementById('totalCheckin').textContent = totalCheckin;
+            document.getElementById('totalMessages').textContent = totalMessages;
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('currentDateTime').textContent = now.toLocaleString('id-ID');
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function initCharts() {
+            // Simple chart for check-ins by hour
+            const ctx = document.getElementById('checkinChart');
+            if (ctx) {
+                const hourlyData = getHourlyCheckins();
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                        datasets: [{
+                            label: 'Check-ins',
+                            data: hourlyData,
+                            borderColor: 'rgb(147, 51, 234)',
+                            backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function getHourlyCheckins() {
+            const hourlyCount = new Array(24).fill(0);
+            const today = new Date().toDateString();
+            
+            guestData.forEach(guest => {
+                const guestDate = new Date(guest.datetime);
+                if (guestDate.toDateString() === today) {
+                    hourlyCount[guestDate.getHours()]++;
+                }
+            });
+            
+            return hourlyCount;
+        }
+
+        function updateAnalytics() {
+            // Update hourly chart
+            const hourlyCtx = document.getElementById('hourlyChart');
+            if (hourlyCtx) {
+                const hourlyData = getHourlyCheckins();
+                new Chart(hourlyCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                        datasets: [{
+                            label: 'Check-ins per Jam',
+                            data: hourlyData,
+                            backgroundColor: 'rgba(147, 51, 234, 0.8)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Update status chart
+            const statusCtx = document.getElementById('statusChart');
+            if (statusCtx) {
+                const hadir = guestData.filter(g => g.status === 'Hadir').length;
+                const belumHadir = guestData.length - hadir;
+                
+                new Chart(statusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Hadir', 'Belum Hadir'],
+                        datasets: [{
+                            data: [hadir, belumHadir],
+                            backgroundColor: ['#10B981', '#EF4444']
+                        }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+            }
+        }
+
+        // Database functions
+        function loadGuestTable() {
+            const tbody = document.getElementById('guestTableBody');
+            
+            if (guestData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">Belum ada data tamu</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = guestData.map(guest => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-3">${guest.name}</td>
+                    <td class="px-4 py-3">${guest.count}</td>
+                    <td class="px-4 py-3">${new Date(guest.datetime).toLocaleString('id-ID')}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 text-xs rounded-full ${guest.status === 'Hadir' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${guest.status}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 max-w-xs truncate">${guest.message || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function exportData() {
+            if (guestData.length === 0) {
+                alert('Tidak ada data untuk diekspor');
+                return;
+            }
+            
+            const csv = [
+                ['Nama', 'Jumlah', 'Tanggal', 'Waktu', 'Status', 'Ucapan'],
+                ...guestData.map(guest => {
+                    const date = new Date(guest.datetime);
+                    return [
+                        guest.name,
+                        guest.count,
+                        date.toLocaleDateString('id-ID'),
+                        date.toLocaleTimeString('id-ID'),
+                        guest.status,
+                        guest.message || ''
+                    ];
+                })
+            ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `guest-data-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Settings functions
+        function loadSettings() {
+            document.getElementById('brideName').textContent = `${settings.brideName1} & ${settings.brideName2}`;
+            document.getElementById('brideName1').value = settings.brideName1;
+            document.getElementById('brideName2').value = settings.brideName2;
+            document.getElementById('musicVolume').value = settings.musicVolume;
+            document.getElementById('volumeValue').textContent = settings.musicVolume + '%';
+            document.getElementById('themeSelect').value = settings.theme;
+            
+            // Apply theme
+            applyTheme(settings.theme);
+        }
+
+        function saveOperatorSettings() {
+            const eventDateTime = document.getElementById('eventDateTime').value;
+            const musicFile = document.getElementById('musicFile').files[0];
+            const musicVolume = document.getElementById('musicVolume').value;
+            const theme = document.getElementById('themeSelect').value;
+            
+            settings.musicVolume = parseInt(musicVolume);
+            settings.theme = theme;
+            
+            if (eventDateTime) {
+                settings.weddingDate = eventDateTime;
+                document.getElementById('weddingDate').textContent = new Date(eventDateTime).toLocaleDateString('id-ID');
+            }
+            
+            if (musicFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const audio = document.getElementById('backgroundMusic');
+                    audio.src = e.target.result;
+                    audio.volume = settings.musicVolume / 100;
+                    audio.play();
+                };
+                reader.readAsDataURL(musicFile);
+            }
+            
+            applyTheme(theme);
+            localStorage.setItem('weddingSettings', JSON.stringify(settings));
+            alert('Pengaturan operator berhasil disimpan!');
+        }
+
+        function saveAdminSettings() {
+            const newUrl = document.getElementById('newGuestbookUrl').value;
+            const backgroundImage = document.getElementById('backgroundImage').files[0];
+            const brideName1 = document.getElementById('brideName1').value;
+            const brideName2 = document.getElementById('brideName2').value;
+            const newUsername = document.getElementById('newUsername').value;
+            const newPassword = document.getElementById('newPassword').value;
+            
+            if (brideName1 && brideName2) {
+                settings.brideName1 = brideName1;
+                settings.brideName2 = brideName2;
+                document.getElementById('brideName').textContent = `${brideName1} & ${brideName2}`;
+            }
+            
+            if (newUsername && newPassword) {
+                settings.adminUsername = newUsername;
+                settings.adminPassword = newPassword;
+            }
+            
+            if (backgroundImage) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Update background image
+                    const homeSection = document.querySelector('#homeSection .wedding-bg');
+                    homeSection.style.backgroundImage = `url(${e.target.result})`;
+                };
+                reader.readAsDataURL(backgroundImage);
+            }
+            
+            localStorage.setItem('weddingSettings', JSON.stringify(settings));
+            alert('Pengaturan admin berhasil disimpan!');
+        }
+
+        function generateNewUrl() {
+            const urlName = document.getElementById('newGuestbookUrl').value;
+            if (urlName) {
+                const newUrl = `${window.location.origin}/guestbook/${urlName}`;
+                alert(`URL baru berhasil dibuat:\n${newUrl}`);
+            }
+        }
+
+        function applyTheme(theme) {
+            const sidebar = document.getElementById('sidebar');
+            const themes = {
+                purple: 'bg-gradient-wedding',
+                gold: 'bg-gradient-gold',
+                blue: 'bg-gradient-to-br from-blue-600 to-blue-800',
+                pink: 'bg-gradient-to-br from-pink-500 to-rose-600'
+            };
+            
+            // Remove all theme classes
+            Object.values(themes).forEach(themeClass => {
+                sidebar.classList.remove(...themeClass.split(' '));
+            });
+            
+            // Add selected theme
+            sidebar.classList.add(...themes[theme].split(' '));
+        }
+
+        // Volume control
+        document.getElementById('musicVolume').addEventListener('input', function() {
+            const volume = this.value;
+            document.getElementById('volumeValue').textContent = volume + '%';
+            const audio = document.getElementById('backgroundMusic');
+            audio.volume = volume / 100;
+        });
+
+        // Sample data for testing
+        function addSampleData() {
+            const sampleGuests = [
+                { name: 'Budi Santoso', count: 2, message: 'Selamat menempuh hidup baru! Semoga bahagia selalu.' },
+                { name: 'Siti Nurhaliza', count: 1, message: 'Barakallahu lakuma wa baraka alaikuma!' },
+                { name: 'Ahmad Fauzi', count: 3, message: 'Semoga menjadi keluarga yang sakinah mawaddah warahmah.' },
+                { name: 'Dewi Sartika', count: 2, message: 'Selamat ya! Semoga langgeng sampai kakek nenek.' },
+                { name: 'Rudi Hermawan', count: 1, message: 'Congratulations! Wishing you both endless love and happiness.' }
+            ];
+            
+            sampleGuests.forEach((guest, index) => {
+                const guestData = {
+                    id: Date.now() + index,
+                    name: guest.name,
+                    count: guest.count,
+                    datetime: new Date(Date.now() - Math.random() * 86400000).toISOString(),
+                    status: 'Hadir',
+                    message: guest.message,
+                    checkinBy: 'System'
+                };
+                
+                guestData.push(guestData);
+            });
+            
+            localStorage.setItem('guestData', JSON.stringify(guestData));
+        }
+
+        // Add sample data on first load
+        if (guestData.length === 0) {
+            addSampleData();
+            guestData = JSON.parse(localStorage.getItem('guestData')) || [];
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f6e2fd61b089d3',t:'MTc2MDYxMDY4Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
